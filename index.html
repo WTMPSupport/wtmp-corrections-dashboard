@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>WTMP Corrections Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     :root {
@@ -12,7 +12,6 @@
       --mint: #B8E4C2;
       --coral: #FF6B6B;
       --cream: #F8F5EC;
-      --gray: #AAB2BD;
     }
 
     body {
@@ -22,6 +21,7 @@
       color: #1f2937;
     }
 
+    /* HERO */
     .hero {
       background: var(--navy);
       padding: 60px 20px;
@@ -33,6 +33,9 @@
       width: 220px;
       max-width: 80%;
       margin-bottom: 20px;
+
+      /* 🔥 THIS MAKES IT WHITE */
+      filter: brightness(0) invert(1);
     }
 
     .hero h1 {
@@ -41,12 +44,14 @@
       margin: 0;
     }
 
+    /* LAYOUT */
     .wrap {
       max-width: 1200px;
       margin: 0 auto;
       padding: 30px;
     }
 
+    /* CONTROLS */
     .controls {
       display: grid;
       grid-template-columns: 2fr 1fr 1fr;
@@ -58,8 +63,15 @@
       padding: 12px;
       border-radius: 8px;
       border: 1px solid #ddd;
+      font-size: 14px;
     }
 
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--teal);
+    }
+
+    /* TABLE */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -98,7 +110,7 @@
 
   <div class="wrap">
 
-    <!-- CONTROLS -->
+    <!-- FILTERS -->
     <div class="controls">
       <input id="search" placeholder="Search corrections...">
       <select id="series"></select>
@@ -137,7 +149,7 @@
     const componentSelect = document.getElementById("component");
 
     function populateFilters() {
-      const series = [...new Set(data.map(r => r[1]))];
+      const series = [...new Set(data.map(r => r[0]))];
       const components = [...new Set(data.map(r => r[3]))];
 
       seriesSelect.innerHTML = "<option value=''>All Series</option>" +
@@ -156,7 +168,7 @@
 
       data
         .filter(r =>
-          (!seriesVal || r[1] === seriesVal) &&
+          (!seriesVal || r[0] === seriesVal) &&
           (!compVal || r[3] === compVal) &&
           r.join(" ").toLowerCase().includes(term)
         )

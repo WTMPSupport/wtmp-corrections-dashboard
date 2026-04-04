@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WTMP Corrections Dashboard</title>
+
+  <style>
+    :root {
+      --navy: #00225F;
+      --teal: #00A6A6;
+      --mint: #B8E4C2;
+      --coral: #FF6B6B;
+      --cream: #F8F5EC;
+      --gray: #AAB2BD;
+    }
+
+    body {
+      margin: 0;
+      font-family: Montserrat, Arial, sans-serif;
+      background: var(--cream);
+      color: #1f2937;
+    }
+
+    .hero {
+      background: var(--navy);
+      padding: 60px 20px;
+      text-align: center;
+      color: white;
+    }
+
+    .logo {
+      width: 220px;
+      max-width: 80%;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: Garamond, serif;
+      font-size: 2.8rem;
+      margin: 0;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    input, select {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #f3f4f6;
+      text-align: left;
+      padding: 12px;
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HERO -->
+  <div class="hero">
+    <img src="WTMP_Logo_Master_Vector.svg" class="logo">
+    <h1>Corrections Dashboard</h1>
+  </div>
+
+  <div class="wrap">
+
+    <!-- CONTROLS -->
+    <div class="controls">
+      <input id="search" placeholder="Search corrections...">
+      <select id="series"></select>
+      <select id="component"></select>
+    </div>
+
+    <!-- TABLE -->
+    <table>
+      <thead>
+        <tr>
+          <th>Series</th>
+          <th>Volume</th>
+          <th>Edition</th>
+          <th>Component</th>
+          <th>Page</th>
+          <th>Location</th>
+          <th>Issue</th>
+          <th>File</th>
+        </tr>
+      </thead>
+      <tbody id="table"></tbody>
+    </table>
+
+  </div>
+
+  <script>
+    const data = [
+      ["Story of the World","Vol 1","Revised","Activity Book",43,"Lesson 15","Fix wording error",""],
+      ["Math With Confidence","Grade 3","Current","WB",12,"Unit 2","Correct example","file.pdf"],
+      ["Grammar for the Well-Trained Mind","Purple","Initial","WB",71,"Exercise 22C","Fix plural wording",""]
+    ];
+
+    const table = document.getElementById("table");
+    const search = document.getElementById("search");
+    const seriesSelect = document.getElementById("series");
+    const componentSelect = document.getElementById("component");
+
+    function populateFilters() {
+      const series = [...new Set(data.map(r => r[1]))];
+      const components = [...new Set(data.map(r => r[3]))];
+
+      seriesSelect.innerHTML = "<option value=''>All Series</option>" +
+        series.map(s => `<option>${s}</option>`).join("");
+
+      componentSelect.innerHTML = "<option value=''>All Components</option>" +
+        components.map(c => `<option>${c}</option>`).join("");
+    }
+
+    function render() {
+      const term = search.value.toLowerCase();
+      const seriesVal = seriesSelect.value;
+      const compVal = componentSelect.value;
+
+      table.innerHTML = "";
+
+      data
+        .filter(r =>
+          (!seriesVal || r[1] === seriesVal) &&
+          (!compVal || r[3] === compVal) &&
+          r.join(" ").toLowerCase().includes(term)
+        )
+        .forEach(r => {
+          const row = `<tr>${r.map(c => `<td>${c || "-"}</td>`).join("")}</tr>`;
+          table.innerHTML += row;
+        });
+    }
+
+    search.addEventListener("input", render);
+    seriesSelect.addEventListener("change", render);
+    componentSelect.addEventListener("change", render);
+
+    populateFilters();
+    render();
+  </script>
+
+</body>
+</html>

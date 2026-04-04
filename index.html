@@ -33,8 +33,6 @@
       width: 220px;
       max-width: 80%;
       margin-bottom: 20px;
-
-      /* 🔥 THIS MAKES IT WHITE */
       filter: brightness(0) invert(1);
     }
 
@@ -64,11 +62,19 @@
       border-radius: 8px;
       border: 1px solid #ddd;
       font-size: 14px;
+      background: white;
     }
 
     input:focus, select:focus {
       outline: none;
       border-color: var(--teal);
+    }
+
+    /* STATUS */
+    .status {
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: #555;
     }
 
     /* TABLE */
@@ -92,10 +98,25 @@
       padding: 12px;
       border-bottom: 1px solid #eee;
       font-size: 0.95rem;
+      vertical-align: top;
     }
 
     tr:hover {
       background: #f9fafb;
+    }
+
+    a.file-link {
+      color: var(--navy);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    a.file-link:hover {
+      text-decoration: underline;
+    }
+
+    .muted {
+      color: #888;
     }
   </style>
 </head>
@@ -104,11 +125,13 @@
 
   <!-- HERO -->
   <div class="hero">
-    <img src="WTMP_Logo_Master_Vector.svg" class="logo">
+    <img src="WTMP_Logo_Master_Vector.svg" class="logo" alt="WTMP Logo">
     <h1>Corrections Dashboard</h1>
   </div>
 
   <div class="wrap">
+
+    <div class="status" id="status">Loading corrections…</div>
 
     <!-- FILTERS -->
     <div class="controls">
@@ -137,26 +160,35 @@
   </div>
 
   <script>
-    const data = [
-      ["Story of the World","Vol 1","Revised","Activity Book",43,"Lesson 15","Fix wording error",""],
-      ["Math With Confidence","Grade 3","Current","WB",12,"Unit 2","Correct example","file.pdf"],
-      ["Grammar for the Well-Trained Mind","Purple","Initial","WB",71,"Exercise 22C","Fix plural wording",""]
-    ];
+    // 🔥 PASTE YOUR APPS SCRIPT URL HERE
+    const DATA_URL = "https://script.google.com/macros/s/AKfycbxobJV1XF6XAsi4lTsChj5L_KuvqH3Gzm1PqXxEas_TgR2CkClkeTYTzPDj-pGlhRQGQw/exec";
+
+    let data = [];
 
     const table = document.getElementById("table");
     const search = document.getElementById("search");
     const seriesSelect = document.getElementById("series");
     const componentSelect = document.getElementById("component");
+    const status = document.getElementById("status");
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
 
     function populateFilters() {
-      const series = [...new Set(data.map(r => r[0]))];
-      const components = [...new Set(data.map(r => r[3]))];
+      const series = [...new Set(data.map(r => r.series).filter(Boolean))].sort();
+      const components = [...new Set(data.map(r => r.component).filter(Boolean))].sort();
 
-      seriesSelect.innerHTML = "<option value=''>All Series</option>" +
-        series.map(s => `<option>${s}</option>`).join("");
+      seriesSelect.innerHTML =
+        "<option value=''>All Series</option>" +
+        series.map(s => `<option>${escapeHtml(s)}</option>`).join("");
 
-      componentSelect.innerHTML = "<option value=''>All Components</option>" +
-        components.map(c => `<option>${c}</option>`).join("");
+      componentSelect.innerHTML =
+        "<option value=''>All Components</option>" +
+        components.map(c => `<option>${escapeHtml(c)}</option>`).join("");
     }
 
     function render() {
@@ -166,24 +198,59 @@
 
       table.innerHTML = "";
 
-      data
-        .filter(r =>
-          (!seriesVal || r[0] === seriesVal) &&
-          (!compVal || r[3] === compVal) &&
-          r.join(" ").toLowerCase().includes(term)
-        )
-        .forEach(r => {
-          const row = `<tr>${r.map(c => `<td>${c || "-"}</td>`).join("")}</tr>`;
-          table.innerHTML += row;
-        });
+      const filtered = data.filter(r =>
+        (!seriesVal || r.series === seriesVal) &&
+        (!compVal || r.component === compVal) &&
+        JSON.stringify(r).toLowerCase().includes(term)
+      );
+
+      if (!filtered.length) {
+        table.innerHTML = "<tr><td colspan='8' class='muted'>No results found</td></tr>";
+        return;
+      }
+
+      filtered.forEach(r => {
+        const fileCell = r.fileUrl
+          ? `<a class="file-link" href="${r.fileUrl}" target="_blank">${escapeHtml(r.fileText || "Open")}</a>`
+          : (r.fileText ? escapeHtml(r.fileText) : "-");
+
+        const row = `
+          <tr>
+            <td>${escapeHtml(r.series)}</td>
+            <td>${escapeHtml(r.volume)}</td>
+            <td>${escapeHtml(r.edition)}</td>
+            <td>${escapeHtml(r.component)}</td>
+            <td>${escapeHtml(r.page)}</td>
+            <td>${escapeHtml(r.location)}</td>
+            <td>${escapeHtml(r.issue)}</td>
+            <td>${fileCell}</td>
+          </tr>
+        `;
+
+        table.innerHTML += row;
+      });
+    }
+
+    async function loadData() {
+      try {
+        const res = await fetch(DATA_URL);
+        data = await res.json();
+
+        status.textContent = `${data.length} corrections loaded`;
+
+        populateFilters();
+        render();
+      } catch (err) {
+        console.error(err);
+        status.textContent = "Error loading data";
+      }
     }
 
     search.addEventListener("input", render);
     seriesSelect.addEventListener("change", render);
     componentSelect.addEventListener("change", render);
 
-    populateFilters();
-    render();
+    loadData();
   </script>
 
 </body>

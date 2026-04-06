@@ -322,9 +322,9 @@
       }
 
       filtered.forEach(r => {
-        const fileCell = r.fileUrl
-          ? `<a class="file-button" href="${escapeHtml(r.fileUrl)}" target="_blank" rel="noopener noreferrer">Open File</a>`
-          : `<span class="muted">—</span>`;
+const fileCell = r.fileUrl
+  ? `<a class="file-button" href="${escapeHtml(r.fileUrl)}" target="_blank" rel="noopener noreferrer">Corrected File</a>`
+  : `<span class="muted">—</span>`;
 
         const row = `
           <tr>

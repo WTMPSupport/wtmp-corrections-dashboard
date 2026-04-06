@@ -8,9 +8,6 @@
   <style>
     :root {
       --navy: #00225F;
-      --teal: #00A6A6;
-      --mint: #B8E4C2;
-      --coral: #FF6B6B;
       --bg: #f7f9fc;
       --white: #ffffff;
       --text: #1f2937;
@@ -18,11 +15,6 @@
       --line: #dfe5ec;
       --header: #eef3f8;
       --shadow: 0 4px 14px rgba(0, 34, 95, 0.06);
-      --radius: 14px;
-    }
-
-    * {
-      box-sizing: border-box;
     }
 
     body {
@@ -32,75 +24,63 @@
       color: var(--text);
     }
 
-  .hero {
-  background: var(--navy);
-  padding: 32px 20px 26px; /* 🔥 reduced height */
-  text-align: center;
-  color: white;
-}
+    /* 🔥 FIXED HERO */
+    .hero {
+      background: var(--navy);
+      padding: 28px 20px 22px; /* reduced height */
+      text-align: center;
+      color: white;
     }
 
+    /* 🔥 CRITICAL FIX: contain SVG */
     .logo {
-  width: 180px; /* 🔥 less visual weight */
-      max-width: 80%;
-      margin-bottom: 18px;
+      width: 160px;
+      max-width: 90%;
+      height: auto;
+      margin-bottom: 10px;
       filter: brightness(0) invert(1);
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .hero h1 {
       font-family: Garamond, Georgia, serif;
-      font-size: 2.7rem;
-      line-height: 1.05;
-      margin: 0;
-      font-weight: 700;
-      letter-spacing: 0.01em;
+      font-size: 2.2rem;
+      margin: 6px 0 0;
     }
 
     .wrap {
       max-width: 1280px;
       margin: 0 auto;
-      padding: 28px 24px 36px;
+      padding: 24px;
     }
 
     .status {
-      margin: 0 0 16px;
-      font-size: 0.95rem;
-      color: var(--muted);
       text-align: center;
+      color: var(--muted);
+      margin-bottom: 14px;
     }
 
     .controls {
       display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr;
+      grid-template-columns: 1.3fr 1fr 1fr;
       gap: 12px;
-      margin-bottom: 18px;
-      align-items: center;
+      margin-bottom: 16px;
     }
 
-    input,
-    select {
-      width: 100%;
-      padding: 12px 14px;
+    input, select {
+      padding: 11px 13px;
       border-radius: 10px;
       border: 1px solid var(--line);
-      font-size: 14px;
       background: var(--white);
-      color: var(--text);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: var(--teal);
-      box-shadow: 0 0 0 3px rgba(0, 166, 166, 0.12);
     }
 
     .table-shell {
       background: var(--white);
-      border-radius: 18px;
+      border-radius: 16px;
       box-shadow: var(--shadow);
-      padding: 14px;
+      padding: 12px;
       max-height: 70vh;
       overflow-y: auto;
       overflow-x: auto;
@@ -110,143 +90,90 @@
       width: 100%;
       min-width: 1100px;
       border-collapse: separate;
-      border-spacing: 0 12px;
+      border-spacing: 0 10px;
       table-layout: fixed;
-      background: transparent;
     }
 
     thead th {
       background: var(--header);
-      color: #4b5563;
-      text-align: left;
-      padding: 13px 14px;
-      font-size: 0.84rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
+      padding: 12px;
+      font-size: 0.85rem;
       position: sticky;
       top: 0;
       z-index: 5;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-    }
-
-    thead th:first-child {
-      border-top-left-radius: 10px;
-      border-bottom-left-radius: 10px;
-    }
-
-    thead th:last-child {
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
     }
 
     tbody tr {
-      background: var(--white);
-      box-shadow: 0 2px 8px rgba(0, 34, 95, 0.05);
+      background: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
     td {
-      padding: 16px 14px;
-      font-size: 0.95rem;
-      line-height: 1.45;
+      padding: 14px;
       vertical-align: top;
-      white-space: normal;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
       border-top: 1px solid #eef2f6;
       border-bottom: 1px solid #eef2f6;
+      word-wrap: break-word;
     }
 
     td:first-child {
+      font-weight: bold;
       border-left: 1px solid #eef2f6;
-      border-top-left-radius: 12px;
-      border-bottom-left-radius: 12px;
-      font-weight: 700;
+      border-radius: 10px 0 0 10px;
     }
 
     td:last-child {
       border-right: 1px solid #eef2f6;
-      border-top-right-radius: 12px;
-      border-bottom-right-radius: 12px;
+      border-radius: 0 10px 10px 0;
+      text-align: center;
     }
 
-    tbody tr:hover td {
-      background: #fbfcfe;
-    }
-
-    th:nth-child(1), td:nth-child(1) { width: 16%; } /* Series */
-    th:nth-child(2), td:nth-child(2) { width: 10%; } /* Volume */
-    th:nth-child(3), td:nth-child(3) { width: 10%; } /* Edition */
-    th:nth-child(4), td:nth-child(4) { width: 12%; } /* Component */
-    th:nth-child(5), td:nth-child(5) { width: 6%; }  /* Page */
-    th:nth-child(6), td:nth-child(6) { width: 14%; } /* Location */
-    th:nth-child(7), td:nth-child(7) { width: 24%; } /* Issue */
-    th:nth-child(8), td:nth-child(8) { width: 8%; text-align: center; }  /* File */
+    /* column widths */
+    th:nth-child(1), td:nth-child(1) { width: 16%; }
+    th:nth-child(2), td:nth-child(2) { width: 10%; }
+    th:nth-child(3), td:nth-child(3) { width: 10%; }
+    th:nth-child(4), td:nth-child(4) { width: 12%; }
+    th:nth-child(5), td:nth-child(5) { width: 6%; }
+    th:nth-child(6), td:nth-child(6) { width: 14%; }
+    th:nth-child(7), td:nth-child(7) { width: 24%; }
+    th:nth-child(8), td:nth-child(8) { width: 8%; }
 
     .file-button {
-      display: inline-block;
       background: var(--navy);
       color: white;
-      text-decoration: none;
       font-size: 0.78rem;
-      font-weight: 700;
-      padding: 8px 10px;
+      padding: 8px;
       border-radius: 10px;
-      text-align: center;
+      display: inline-block;
+      text-decoration: none;
       line-height: 1.2;
       white-space: normal;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-    }
-
-    .file-button:hover {
-      opacity: 0.92;
-      transform: translateY(-1px);
     }
 
     .empty-row td {
       text-align: center;
       color: var(--muted);
-      padding: 28px 18px;
-    }
-
-    .muted {
-      color: var(--muted);
+      padding: 24px;
     }
 
     @media (max-width: 900px) {
-      .hero {
-        padding: 42px 20px 36px;
-      }
-
-      .hero h1 {
-        font-size: 2.25rem;
-      }
-
-      .logo {
-        width: 180px;
-      }
-
-      .wrap {
-        padding: 22px 16px 30px;
-      }
-
       .controls {
         grid-template-columns: 1fr;
       }
-
-      .table-shell {
-        padding: 10px;
-      }
     }
+
   </style>
 </head>
 
 <body>
+
   <div class="hero">
-    <img src="WTMP_Logo_Master_Vector.svg" class="logo" alt="WTMP Logo">
+    <img src="WTMP_Logo_Master_Vector.svg" class="logo">
     <h1>Curriculum Corrections</h1>
   </div>
 
   <div class="wrap">
+
     <div class="status" id="status">Loading corrections…</div>
 
     <div class="controls">
@@ -272,6 +199,7 @@
         <tbody id="table"></tbody>
       </table>
     </div>
+
   </div>
 
   <script>
@@ -285,30 +213,21 @@
     const componentSelect = document.getElementById("component");
     const status = document.getElementById("status");
 
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
     function populateFilters() {
       const series = [...new Set(data.map(r => r.series).filter(Boolean))].sort();
       const components = [...new Set(data.map(r => r.component).filter(Boolean))].sort();
 
       seriesSelect.innerHTML =
         "<option value=''>All Series</option>" +
-        series.map(s => `<option>${escapeHtml(s)}</option>`).join("");
+        series.map(s => `<option>${s}</option>`).join("");
 
       componentSelect.innerHTML =
         "<option value=''>All Components</option>" +
-        components.map(c => `<option>${escapeHtml(c)}</option>`).join("");
+        components.map(c => `<option>${c}</option>`).join("");
     }
 
     function render() {
-      const term = search.value.toLowerCase().trim();
+      const term = search.value.toLowerCase();
       const seriesVal = seriesSelect.value;
       const compVal = componentSelect.value;
 
@@ -321,54 +240,40 @@
       );
 
       if (!filtered.length) {
-        table.innerHTML = `
-          <tr class="empty-row">
-            <td colspan="8">No results found.</td>
-          </tr>
-        `;
+        table.innerHTML = "<tr class='empty-row'><td colspan='8'>No results found.</td></tr>";
         return;
       }
 
       filtered.forEach(r => {
         const fileCell = r.fileUrl
-          ? `<a class="file-button" href="${escapeHtml(r.fileUrl)}" target="_blank" rel="noopener noreferrer">Corrected<br>File</a>`
-          : `<span class="muted">—</span>`;
+          ? `<a class="file-button" href="${r.fileUrl}" target="_blank">Corrected<br>File</a>`
+          : "—";
 
-        const row = `
+        table.innerHTML += `
           <tr>
-            <td>${escapeHtml(r.series)}</td>
-            <td>${escapeHtml(r.volume)}</td>
-            <td>${escapeHtml(r.edition)}</td>
-            <td>${escapeHtml(r.component)}</td>
-            <td>${escapeHtml(r.page)}</td>
-            <td>${escapeHtml(r.location)}</td>
-            <td>${escapeHtml(r.issue)}</td>
+            <td>${r.series}</td>
+            <td>${r.volume}</td>
+            <td>${r.edition}</td>
+            <td>${r.component}</td>
+            <td>${r.page}</td>
+            <td>${r.location}</td>
+            <td>${r.issue}</td>
             <td>${fileCell}</td>
           </tr>
         `;
-
-        table.innerHTML += row;
       });
     }
 
     async function loadData() {
       try {
         const res = await fetch(DATA_URL);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
         data = await res.json();
-        status.textContent = `${data.length} correction${data.length === 1 ? "" : "s"} loaded`;
+        status.textContent = data.length + " corrections loaded";
 
         populateFilters();
         render();
-      } catch (err) {
-        console.error(err);
-        status.textContent = "Unable to load corrections right now.";
-        table.innerHTML = `
-          <tr class="empty-row">
-            <td colspan="8">Could not load corrections.</td>
-          </tr>
-        `;
+      } catch {
+        status.textContent = "Error loading data";
       }
     }
 
@@ -378,5 +283,6 @@
 
     loadData();
   </script>
+
 </body>
 </html>

@@ -71,6 +71,10 @@
       margin-bottom: 16px;
     }
 
+    .control-hidden {
+      display: none !important;
+    }
+
     input,
     select {
       padding: 11px 13px;
@@ -79,6 +83,7 @@
       background: var(--white);
       font-size: 14px;
       color: var(--text);
+      width: 100%;
     }
 
     input:focus,
@@ -235,8 +240,14 @@
 
     <div class="controls">
       <input id="search" placeholder="Search corrections...">
-      <select id="series"></select>
-      <select id="component"></select>
+
+      <select id="series">
+        <option value="">All Series</option>
+      </select>
+
+      <select id="component">
+        <option value="">All Components</option>
+      </select>
     </div>
 
     <div class="table-shell">
@@ -263,6 +274,54 @@
   <script>
     const DATA_URL = "https://script.google.com/macros/s/AKfycbyS-P_zbHjgR34RfKZArAvPMyRO7Olv2nQZ92CNiWqPjqUmbmYhj_b4l8DFp0ZISSOfBQ/exec";
 
+    const seriesRules = {
+      "Math With Confidence": {
+        components: ["Instructor Guide", "Workbook", "Workbook A", "Workbook B"]
+      },
+      "Grammar for the Well-Trained Mind": {
+        components: ["Instructor Guide", "Key", "Workbook"]
+      },
+      "Writing With Ease": {
+        components: ["Instructor Guide", "Workbook"]
+      },
+      "Writing With Skill": {
+        components: ["Instructor Guide", "Workbook"]
+      },
+      "Story of the World": {
+        components: [
+          "Text",
+          "Test and Answer Key",
+          "Review Questions",
+          "Student Pages",
+          "Act Book Student",
+          "Act Book Instructor",
+          "Workbook",
+          "Audiobook"
+        ]
+      },
+      "First Language Lessons": {
+        components: ["Instructor Guide", "Workbook"]
+      },
+      "The Ordinary Parent’s Guide to Reading": {
+        components: ["Text"]
+      },
+      "History of the World": {
+        components: ["Study Guide"]
+      },
+      "Famous Figures": {
+        components: ["Text"]
+      },
+      "Facts That Stick": {
+        components: ["Blackline Masters", "Text"]
+      },
+      "Who in the World": {
+        components: ["Text"]
+      },
+      "Creative Writer": {
+        components: ["Text"]
+      }
+    };
+
     let data = [];
 
     const table = document.getElementById("table");
@@ -280,31 +339,76 @@
         .replace(/'/g, "&#039;");
     }
 
-    function populateFilters() {
-      const series = [...new Set(data.map(r => r.series).filter(Boolean))].sort();
-      const components = [...new Set(data.map(r => r.component).filter(Boolean))].sort();
+    function normalizeValue(value) {
+      return String(value ?? "").trim();
+    }
+
+    function uniqueSorted(values) {
+      return [...new Set(values.map(normalizeValue).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+    }
+
+    function getAllowedComponents(selectedSeries) {
+      if (!selectedSeries) {
+        return uniqueSorted(data.map(r => r.component));
+      }
+
+      if (seriesRules[selectedSeries]) {
+        return uniqueSorted(seriesRules[selectedSeries].components);
+      }
+
+      return uniqueSorted(
+        data
+          .filter(r => normalizeValue(r.series) === selectedSeries)
+          .map(r => r.component)
+      );
+    }
+
+    function populateSeriesFilter() {
+      const series = uniqueSorted(data.map(r => r.series));
 
       seriesSelect.innerHTML =
         "<option value=''>All Series</option>" +
-        series.map(s => `<option>${escapeHtml(s)}</option>`).join("");
+        series.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join("");
+    }
+
+    function populateComponentFilter() {
+      const selectedSeries = normalizeValue(seriesSelect.value);
+      const previousValue = normalizeValue(componentSelect.value);
+      const allowedComponents = getAllowedComponents(selectedSeries);
 
       componentSelect.innerHTML =
         "<option value=''>All Components</option>" +
-        components.map(c => `<option>${escapeHtml(c)}</option>`).join("");
+        allowedComponents.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+
+      const canKeepPrevious =
+        previousValue &&
+        allowedComponents.includes(previousValue);
+
+      componentSelect.value = canKeepPrevious ? previousValue : "";
+
+      if (selectedSeries && allowedComponents.length <= 1) {
+        componentSelect.classList.add("control-hidden");
+        componentSelect.value = "";
+      } else {
+        componentSelect.classList.remove("control-hidden");
+      }
     }
 
     function render() {
       const term = search.value.toLowerCase().trim();
-      const seriesVal = seriesSelect.value;
-      const compVal = componentSelect.value;
+      const seriesVal = normalizeValue(seriesSelect.value);
+      const compVal = normalizeValue(componentSelect.value);
 
       table.innerHTML = "";
 
-      const filtered = data.filter(r =>
-        (!seriesVal || r.series === seriesVal) &&
-        (!compVal || r.component === compVal) &&
-        JSON.stringify(r).toLowerCase().includes(term)
-      );
+      const filtered = data.filter(r => {
+        const matchesSeries = !seriesVal || normalizeValue(r.series) === seriesVal;
+        const matchesComponent = !compVal || normalizeValue(r.component) === compVal;
+        const matchesSearch = !term || JSON.stringify(r).toLowerCase().includes(term);
+
+        return matchesSeries && matchesComponent && matchesSearch;
+      });
 
       if (!filtered.length) {
         table.innerHTML = "<tr class='empty-row'><td colspan='9'>No results found.</td></tr>";
@@ -344,7 +448,8 @@
 
         status.textContent = `${data.length} correction${data.length === 1 ? "" : "s"} loaded`;
 
-        populateFilters();
+        populateSeriesFilter();
+        populateComponentFilter();
         render();
       } catch (err) {
         console.error(err);
@@ -354,7 +459,13 @@
     }
 
     search.addEventListener("input", render);
-    seriesSelect.addEventListener("change", render);
+
+    seriesSelect.addEventListener("change", () => {
+      componentSelect.value = "";
+      populateComponentFilter();
+      render();
+    });
+
     componentSelect.addEventListener("change", render);
 
     loadData();

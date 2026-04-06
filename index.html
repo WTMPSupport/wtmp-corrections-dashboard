@@ -178,18 +178,20 @@
     th:nth-child(7), td:nth-child(7) { width: 24%; } /* Issue */
     th:nth-child(8), td:nth-child(8) { width: 8%; }  /* File */
 
-    .file-button {
-      display: inline-block;
-      background: var(--navy);
-      color: white;
-      text-decoration: none;
-      font-size: 0.84rem;
-      font-weight: 700;
-      padding: 9px 12px;
-      border-radius: 10px;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-      text-align: center;
-      white-space: nowrap;
+  .file-button {
+  display: inline-block;
+  background: var(--navy);
+  color: white;
+  text-decoration: none;
+  font-size: 0.78rem; /* slightly smaller */
+  font-weight: 700;
+  padding: 8px 10px;
+  border-radius: 10px;
+  text-align: center;
+
+  line-height: 1.2; /* tighter vertical spacing */
+  white-space: normal; /* 🔥 allow wrapping */
+}
     }
 
     .file-button:hover {
@@ -323,7 +325,7 @@
 
       filtered.forEach(r => {
 const fileCell = r.fileUrl
-  ? `<a class="file-button" href="${escapeHtml(r.fileUrl)}" target="_blank" rel="noopener noreferrer">Corrected File</a>`
+  ? `<a class="file-button" href="${escapeHtml(r.fileUrl)}" target="_blank" rel="noopener noreferrer">Corrected<br>File</a>`
   : `<span class="muted">—</span>`;
 
         const row = `

@@ -299,6 +299,10 @@
 
     const reportDialog = document.getElementById("report-dialog");
     const reportFrame = document.getElementById("report-frame");
+    window.addEventListener("message", event => {
+      const allowedOrigin = /^https:\/\/(?:[a-z0-9-]+\.)?script\.googleusercontent\.com$/.test(event.origin) || event.origin === "https://script.google.com";
+      if (allowedOrigin && event.data && event.data.type === "wtmp-close-correction-report" && reportDialog.open) reportDialog.close();
+    });
     document.querySelectorAll(".report-button").forEach(button => {
       button.addEventListener("click", () => {
         if (!reportFrame.getAttribute("src")) reportFrame.src = DATA_URL + "?view=report";

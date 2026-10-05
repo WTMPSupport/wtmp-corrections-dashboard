@@ -30,7 +30,8 @@
 
     .hero {
       background: var(--navy);
-      padding: 28px 20px 22px;
+      position: relative;
+      padding: 28px 20px 42px;
       text-align: center;
       color: white;
     }
@@ -203,6 +204,20 @@
       color: var(--muted);
     }
 
+    .notice { background: white; padding: 16px; border-left: 4px solid var(--navy); line-height: 1.5; }
+    .corrected-check { width: 20px; height: 20px; accent-color: var(--navy); opacity: 1; }
+    th:nth-child(9), td:nth-child(9) { text-align: center; }
+    .report-button { position: absolute; bottom: 8px; height: 30px; padding: 0 12px; border: 1px solid rgba(255,255,255,.65); border-radius: 8px; background: rgba(255,255,255,.1); color: white; font: 12px Montserrat,Arial,sans-serif; cursor: pointer; }
+    .report-button:hover { background: rgba(255,255,255,.2); }
+    .report-button:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+    .report-left { left: 20px; } .report-right { right: 20px; }
+    #report-dialog { box-sizing: border-box; width: min(820px,94vw); max-height: 90vh; padding: 24px; border: 0; border-radius: 16px; color: var(--text); box-shadow: var(--shadow); overflow: auto; }
+    #report-dialog::backdrop { background: rgba(0, 20, 55, .6); }
+    .report-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .report-heading h2 { margin: 0; font-family: Garamond,Georgia,serif; color: var(--navy); }
+    #close-report { padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--header); color: var(--navy); cursor: pointer; }
+    @media(max-width: 480px) { .report-left { left: 12px; } .report-right { right: 12px; } .report-button { font-size: 11px; padding: 0 8px; } }
+    #report-frame { width: 100%; height: 1000px; border: 0; background: white; border-radius: 16px; }
     @media (max-width: 900px) {
       .controls {
         grid-template-columns: 1fr;
@@ -213,7 +228,7 @@
       }
 
       .hero {
-        padding: 24px 16px 20px;
+        padding: 24px 16px 42px;
       }
 
       .hero h1 {
@@ -232,12 +247,15 @@
   <div class="hero">
     <img src="WTMP_Logo_Master_Vector.svg" class="logo" alt="WTMP Logo">
     <h1>Curriculum Corrections</h1>
+    <button type="button" class="report-button report-left">Report a Correction</button>
+    <button type="button" class="report-button report-right">Report a Correction</button>
   </div>
 
   <div class="wrap">
 
     <div class="status" id="status">Loading corrections…</div>
 
+    <p class="notice">Unchecked corrections will be fixed in the next reprint.</p>
     <div class="controls">
       <input id="search" placeholder="Search corrections...">
 
@@ -262,7 +280,7 @@
             <th>Location</th>
             <th>Issue</th>
             <th>File</th>
-            <th>Reprint</th>
+            <th>Corrected</th>
           </tr>
         </thead>
         <tbody id="table"></tbody>
@@ -271,8 +289,23 @@
 
   </div>
 
+  <dialog id="report-dialog" aria-labelledby="report-title">
+    <div class="report-heading"><h2 id="report-title">Report a Correction</h2><button id="close-report" type="button" aria-label="Close correction report">Close</button></div>
+    <p>Reports are sent to our support team for review.</p>
+    <iframe id="report-frame" title="Report a curriculum correction"></iframe>
+  </dialog>
   <script>
     const DATA_URL = "https://script.google.com/macros/s/AKfycbyS-P_zbHjgR34RfKZArAvPMyRO7Olv2nQZ92CNiWqPjqUmbmYhj_b4l8DFp0ZISSOfBQ/exec";
+
+    const reportDialog = document.getElementById("report-dialog");
+    const reportFrame = document.getElementById("report-frame");
+    document.querySelectorAll(".report-button").forEach(button => {
+      button.addEventListener("click", () => {
+        if (!reportFrame.getAttribute("src")) reportFrame.src = DATA_URL + "?view=report";
+        reportDialog.showModal();
+      });
+    });
+    document.getElementById("close-report").addEventListener("click", () => reportDialog.close());
 
     const seriesRules = {
       "Math With Confidence": {
@@ -420,9 +453,8 @@
           ? `<a class="file-button" href="${escapeHtml(r.fileUrl)}" target="_blank" rel="noopener noreferrer">Corrected<br>File</a>`
           : "<span class='muted'>—</span>";
 
-        const reprintCell = r.reprint
-          ? escapeHtml(r.reprint)
-          : "<span class='muted'>—</span>";
+        const isCorrected = r.corrected === true || String(r.corrected).toUpperCase() === "TRUE";
+        const reprintCell = `<input class="corrected-check" type="checkbox" disabled ${isCorrected ? "checked" : ""} aria-label="${isCorrected ? "Corrected" : "Awaiting correction"}">`;
 
         table.innerHTML += `
           <tr>
